@@ -53,25 +53,16 @@ class BrowserMobProxy
 	 *
 	 * @param string $name       The name to associate with the port assigned to the new proxy.
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 *        'port'              => (integer) The specific port to start the proxy service on.
-	 *                                         Optional, default is generated and returned in response.
-	 *        'proxyUsername'     => (string) The username to use to authenticate with the chained proxy. Optional, default to null.
 	 *
-	 *        'proxyPassword'     => (string) The password to use to authenticate with the chained proxy. Optional, default to null.
-	 *
-	 *        'bindAddress'       => (string) If running BrowserMob Proxy in a multi-homed environment, specify a desired bind
-	 *                                        address. Optional, default to "0.0.0.0".
-	 *
-	 *        'serverBindAddress' => (string) If running BrowserMob Proxy in a multi-homed environment, specify a desired
-	 *                                        server bind address. Optional, default to "0.0.0.0".
-	 *
-	 *        'useEcc'            => (boolean) True, Uses Elliptic Curve Cryptography for certificate impersonation. Optional, default
-	 *                                         to "false".
-	 *
-	 *        'trustAllServers'   => (boolean) True, Disables verification of all upstream servers' SSL certificates. All
-	 *                                         upstream servers will be trusted, even if they do not present valid certificates
-	 *                                         signed by certification authorities in the JDK's trust store. Optional, default
-	 *                                         to "false".
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * 'port'              | integer | The specific port to start the proxy service on.Optional, default is generated and returned in response.
+	 * 'proxyUsername'     | string  | The username to use to authenticate with the chained proxy. Optional, default to null.
+	 * 'proxyPassword'     | string  | The password to use to authenticate with the chained proxy. Optional, default to null.
+	 * 'bindAddress'       | string  | If running BrowserMob Proxy in a multi-homed environment, specify a desired bind address. Optional, default to "0.0.0.0".
+	 * 'serverBindAddress' | string  | If running BrowserMob Proxy in a multi-homed environment, specify a desired server bind address. Optional, default to "0.0.0.0".
+	 * 'useEcc'            | boolean | True, Uses Elliptic Curve Cryptography for certificate impersonation. Optional, default to "false".
+	 * 'trustAllServers'   | boolean | True, Disables verification of all upstream servers' SSL certificates. All upstream servers will be trusted, signed by certification authorities in the JDK's trust store. Optional, default to "false".
 	 *
 	 * @return int The port of the newly created proxy.
 	 */
@@ -90,12 +81,15 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'captureHeaders'	   => (boolean) capture headers or not. Optional, default to "false".
-	 *		'captureCookies'	   => (boolean) capture cookies or not. Optional, default to "false".
-	 *		'captureContent'	   => (boolean) capture content bodies or not. Optional, default to "false".
-	 *		'captureBinaryContent' => (boolean) capture binary content or not. Optional, default to "false".
-	 *		'initialPageRef'	   => (string) The string name of the first page ref that should be used in the HAR. Optional, default to "Page 1".
-	 *		'initialPageTitle'	   => (string) The title of first HAR page. Optional, default to initialPageRef.
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * captureHeaders |  boolean | capture headers or not. Optional, default to "false".
+	 * captureCookies |  boolean | capture cookies or not. Optional, default to "false".
+	 * captureContent |  boolean | capture content bodies or not. Optional, default to "false".
+	 * captureBinaryContent |  boolean | capture binary content or not. Optional, default to "false".
+	 * initialPageRef |  string | The string name of the first page ref that should be used in the HAR. Optional, default to "Page 1".
+	 * initialPageTitle |  string | The title of first HAR page. Optional, default to initialPageRef.
 	 *
 	 * @return void
 	 */
@@ -108,17 +102,21 @@ class BrowserMobProxy
 	/**
 	 * Starts a new page on the existing HAR.
 	 *
+	 * @param string $pageRef The string name of the first page ref that should be used in the HAR. Optional, default to "Page N" where N is the next page number.
+	 * @param string $pageTitle The title of new HAR page. Optional, default to pageRef.
 	 * @param string $name
-	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'pageRef' 	=> (string) The string name of the first page ref that should be used in the HAR.
-	 * 					            Optional, default to "Page N" where N is the next page number.
-	 * 		'pageTitle' => (string) The title of new HAR page. Optional, default to pageRef.
+	 *
 	 */
-	public function newHarPage($name = self::DEFAULT_PORT, array $parameters = [])
+	public function newHarPage($pageRef, $pageTitle = '', $name = self::DEFAULT_PORT)
 	{
-		list($parameters, $port) = $this->processArguments(\func_num_args(), $name, $parameters);
+		$port = $this->proxies[$name];
 
-		$this->client->put("proxy/{$port}/har", ['form_params' => $parameters]);
+		$this->client->put("proxy/{$port}/har", [
+			'form_params' =>[
+				'pageRef' => $pageRef,
+				'pageTitle' => $pageTitle
+			]
+		]);
 	}
 
 	/**
@@ -153,8 +151,11 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'regex'  => (string) A comma separated list of regular expressions.
-	 * 		'status' => (int) The HTTP status code to return for URLs that do not match the whitelist.
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * regex |  string | A comma separated list of regular expressions.
+	 * status |  int | The HTTP status code to return for URLs that do not match the whitelist.
 	 *
 	 */
 	public function whitelist($name = self::DEFAULT_PORT, array $parameters = [])
@@ -195,9 +196,12 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'regex'  => (string) The blacklist regular expression.
-	 * 		'status' => (int) The HTTP status code to return for URLs that are blacklisted.
-	 * 		'method' => (string) The regular expression for matching HTTP method (GET, POST, PUT, etc). Optional, by default processing all HTTP method.
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * regex |  string | The blacklist regular expression.
+	 * status |  int | The HTTP status code to return for URLs that are blacklisted.
+	 * method |  string | The regular expression for matching HTTP method (GET, POST, PUT, etc). Optional, by default processing all HTTP method.
 	 *
 	 */
 	public function blacklist($name = self::DEFAULT_PORT, array $parameters = [])
@@ -225,14 +229,17 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'downstreamKbps'    => (int) Sets the downstream bandwidth limit in kbps. Optional.
-	 * 		'upstreamKbps'      => (int) Sets the upstream bandwidth limit kbps. Optional, by default unlimited.
-	 * 		'downstreamMaxKB'   => (int) Specifies how many kilobytes in total the client is allowed to download through the proxy. Optional, by default unlimited.
-	 * 		'upstreamMaxKB'     => (int) Specifies how many kilobytes in total the client is allowed to upload through the proxy. Optional, by default unlimited.
-	 * 		'latency'           => (int) Add the given latency to each HTTP request. Optional, by default all requests are invoked without latency.
-	 * 		'enable'            => (boolean) A boolean that enable bandwidth limiter. Optional, by default to "false", but setting any of the properties above will implicitly enable throttling
-	 * 		'payloadPercentage' => (int) Specifying what percentage of data sent is payload, e.g. use this to take into account overhead due to tcp/ip. Optional.
-	 * 		'maxBitsPerSecond'  => (int) The max bits per seconds you want this instance of StreamManager to respect. Optional.
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * downstreamKbps     | int | Sets the downstream bandwidth limit in kbps. Optional.
+	 * upstreamKbps      | int | Sets the upstream bandwidth limit kbps. Optional, by default unlimited.
+	 * downstreamMaxKB   | int | Specifies how many kilobytes in total the client is allowed to download through the proxy. Optional, by default unlimited.
+	 * upstreamMaxKB     | int | Specifies how many kilobytes in total the client is allowed to upload through the proxy. Optional, by default unlimited.
+	 * latency           | int | Add the given latency to each HTTP request. Optional, by default all requests are invoked without latency.
+	 * enable            | boolean | A boolean that enable bandwidth limiter. Optional, by default to "false", but setting any of the properties above will implicitly enable throttling
+	 * payloadPercentage | int | Specifying what percentage of data sent is payload, e.g. use this to take into account overhead due to tcp/ip. Optional.
+	 * maxBitsPerSecond  | int | The max b its per seconds you want this instance of StreamManager to respect. Optional.
 	 *
 	 */
 	public function limitBandwidth($name = self::DEFAULT_PORT, array $parameters = [])
@@ -317,8 +324,11 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'quietPeriodInMs' => (int) Wait until all request are made. Optional.
-	 * 		'timeoutInMs'     => (int) Sets quiet period in milliseconds. Optional.
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * quietPeriodInMs |  int | Wait until all request are made. Optional.
+	 * timeoutInMs |  int | Sets quiet period in milliseconds. Optional.
 	 *
 	 */
 	public function waitForNetworkTrafficToStop($name = self::DEFAULT_PORT, array $parameters = [])
@@ -333,10 +343,13 @@ class BrowserMobProxy
 	 *
 	 * @param string $name
 	 * @param array  $parameters The payload to submit. The following are the allowed keys.
-	 * 		'requestTimeout'    => (int) Request timeout in milliseconds. A timeout value of -1 is interpreted as infinite timeout. Optional, default to "-1".
-	 * 		'readTimeout'       => (int) Read timeout in milliseconds. Which is the timeout for waiting for data or, put differently, a maximum period inactivity between two consecutive data packets). A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
-	 * 		'connectionTimeout' => (int) Determines the timeout in milliseconds until a connection is established. A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
-	 * 		'dnsCacheTimeout'   => (int) Sets the maximum length of time that records will be stored in this Cache. A nonpositive value disables this feature (that is, sets no limit). Optional, default to "0".Example: {"connectionTimeout" : "500", "readTimeout" : "200"}
+	 *
+	 * Key | Type | Description
+	 * ----|------|------------
+	 * requestTimeout | int | Request timeout in milliseconds. A timeout value of -1 is interpreted as infinite timeout. Optional, default to "-1".
+	 * readTimeout | int | Read timeout in milliseconds. Which is the timeout for waiting for data or, put differently, a maximum period inactivity between two consecutive data packets). A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
+	 * connectionTimeout | int | Determines the timeout in milliseconds until a connection is established. A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
+	 * dnsCacheTimeout | int | Sets the maximum length of time that records will be stored in this Cache. A nonpositive value disables this feature (that is, sets no limit). Optional, default to "0".Example: {"connectionTimeout" : "500", "readTimeout" : "200"}
 	 *
 	 */
 	public function timeout($name = self::DEFAULT_PORT, array $parameters = [])

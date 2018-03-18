@@ -135,12 +135,6 @@ class BrowserMobProxy
 		return $this->client->get("proxy/{$port}/har")->getBody();
 	}
 
-
-
-
-
-
-
 	/**
 	 * Displays whitelisted items
 	 *
@@ -301,10 +295,10 @@ class BrowserMobProxy
 	/**
 	 * Sets automatic basic authentication for the specified domain
 	 *
-	 * @param string $name
 	 * @param string $username
 	 * @param string $password
 	 * @param string $domain
+	 * @param string $name
 	 */
 	public function autoBasicAuth($username, $password, $domain, $name = self::DEFAULT_PORT)
 	{
@@ -446,15 +440,6 @@ class BrowserMobProxy
 			'body' => $javascript
 		]);
 	}
-
-
-
-
-
-
-
-
-
 
 	/**
 	 * Shuts down the proxy and closes the port.

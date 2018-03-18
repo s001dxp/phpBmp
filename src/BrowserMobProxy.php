@@ -269,8 +269,12 @@ class BrowserMobProxy
 	 * @param array  $parameters The payload to submit where key is a header name (such as "User-Agent") and value is a
 	 * 							 value of HTTP header to setup (such as "BrowserMob-Agent").
 	 *
-	 * @example $instance->setOrOverrideHeaders('default', ["User-Agent" => "BrowserMob-Agent"]);
-	 *
+	 * Example:
+	 * ```
+	 * $instance->setOrOverrideHeaders('default', [
+	 * 		"User-Agent" => "BrowserMob-Agent"
+	 * ]);
+	 * ```
 	 */
 	public function setOrOverrideHeaders($name = self::DEFAULT_PORT, array $parameters = [])
 	{
@@ -286,11 +290,13 @@ class BrowserMobProxy
 	 * @param array  $parameters The payload to submit where the keys are host names (such as "example.com") and values
 	 * 							 are IP addresses (such as "1.2.3.4"').
 	 *
-	 * Example: overrideDNS('default',[
+	 * Example:
+	 * ```
+	 * $instance->overrideDNS('default',[
 	 * 		"example.com" => "1.2.3.4",
 	 * 		"foobar.com" => "10.10.10.10"
 	 * ]);
-	 *
+	 * ```
 	 */
 	public function overrideDNS($name = self::DEFAULT_PORT, array $parameters = [])
 	{
@@ -349,7 +355,7 @@ class BrowserMobProxy
 	 * requestTimeout | int | Request timeout in milliseconds. A timeout value of -1 is interpreted as infinite timeout. Optional, default to "-1".
 	 * readTimeout | int | Read timeout in milliseconds. Which is the timeout for waiting for data or, put differently, a maximum period inactivity between two consecutive data packets). A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
 	 * connectionTimeout | int | Determines the timeout in milliseconds until a connection is established. A timeout value of zero is interpreted as an infinite timeout. Optional, default to "60000".
-	 * dnsCacheTimeout | int | Sets the maximum length of time that records will be stored in this Cache. A nonpositive value disables this feature (that is, sets no limit). Optional, default to "0".Example: {"connectionTimeout" : "500", "readTimeout" : "200"}
+	 * dnsCacheTimeout | int | Sets the maximum length of time that records will be stored in this Cache. A nonpositive value disables this feature (that is, sets no limit). Optional, default to "0".
 	 *
 	 */
 	public function timeout($name = self::DEFAULT_PORT, array $parameters = [])

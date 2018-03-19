@@ -43,6 +43,7 @@ class BrowserMobProxy
 	public function __construct($browserMobAddress, array $proxyParams = [], $initialProxyName = self::DEFAULT_PORT)
 	{
 		$urlParts = parse_url($browserMobAddress);
+		$urlParts['scheme'] = $urlParts['scheme'] ?? "http";
 		$this->browserMobUrl = sprintf('%s://%s:%d/', $urlParts['scheme'], $urlParts['host'], $urlParts['port']);
 		$this->client = new Client(['base_uri' => $this->browserMobUrl]);
 

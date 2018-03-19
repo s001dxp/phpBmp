@@ -36,16 +36,17 @@ class BrowserMobProxy
 	 *
 	 * It constructs the object and creates the initial proxy server
 	 *
-	 * @param       $browserMobAddress
-	 * @param array $proxyParams The parameters that will be the payload to set up the initial proxy. @see BrowserMobProxy::createProxy()
+	 * @param string $browserMobAddress The address of the Browser Mob Service
+	 * @param string $initialProxyName Optional, the name to associate with the port assigned to the new proxy. @see BrowserMobProxy::createProxy()
+	 * @param array  $proxyParams The parameters that will be the payload to set up the initial proxy. @see BrowserMobProxy::createProxy()
 	 */
-	public function __construct($browserMobAddress, array $proxyParams = [])
+	public function __construct($browserMobAddress, $initialProxyName = self::DEFAULT_PORT, array $proxyParams = [])
 	{
 		$urlParts = parse_url($browserMobAddress);
 		$this->browserMobUrl = sprintf('%s://%s:%d/', $urlParts['scheme'], $urlParts['host'], $urlParts['port']);
 		$this->client = new Client(['base_uri' => $this->browserMobUrl]);
 
-		$this->createProxy(self::DEFAULT_PORT, $proxyParams);
+		$this->createProxy($initialProxyName, $proxyParams);
 	}
 
 	/**

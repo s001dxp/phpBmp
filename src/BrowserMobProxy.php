@@ -122,15 +122,23 @@ class BrowserMobProxy
 	/**
 	 * Get the HAR contents
 	 *
-	 * Returns the JSON/HAR content representing all the HTTP traffic passed through the proxy
+	 * Returns or saves the JSON/HAR content representing all the HTTP traffic passed through the proxy
 	 *
+	 * @param null   $filename Optional, filename with path of where to save the HAR.
 	 * @param string $name
-	 * @return \Psr\Http\Message\StreamInterface
+	 * @return string|boolean returns boolean false if the file save fails, true if it succeeds. Returns a string of the
+	 * 						  har if $filename is null.
 	 */
-	public function getHar($name = self::DEFAULT_PORT)
+	public function getHar($filename = null, $name = self::DEFAULT_PORT)
 	{
 		$port = $this->proxies[$name];
-		return $this->client->get("proxy/{$port}/har")->getBody();
+		$har = $this->client->get("proxy/{$port}/har")->getBody();
+		if($filename !== null)
+		{
+			$filename = (stripos($filename, '.har') !== false) ? $filename : $filename . ".har";
+			return (boolean)\file_put_contents($filename, $har);
+		}
+		return $har;
 	}
 
 	/**
